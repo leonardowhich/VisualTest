@@ -1,0 +1,3 @@
+﻿  VisualTest.cpp
+c:\users\lofa\documents\github\cpp\visualtest\visualtest\visualtest.cpp(226): warning C4244: 'initializing': conversion from 'LRESULT' to 'int', possible loss of data
+  VisualTest.vcxproj -> C:\Users\Lofa\Documents\GitHub\cpp\VisualTest\x64\Debug\VisualTest.exe
