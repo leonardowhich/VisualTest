@@ -60,5 +60,14 @@
     <Image Include="LOGO.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="..\..\tagscleaning\tagscleaning\icon1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="icon1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Product.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

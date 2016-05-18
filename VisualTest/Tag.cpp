@@ -71,6 +71,38 @@ int Tag::ReadHeader(FILE *fp, short TagNumber)
 
 	return 0;
 }
+int Tag::ReadValues(FILE *fp, short TagNumber) 
+{
+	while (!feof(fp)) 
+	{
+		char line[255];
+		fgets(line, 255, fp);
+		string val[Columns], s = string(line);
+		for (short i = 0; i < Columns; i++)
+		{
+			val[i] = s.substr(0, s.find(','));
+			s = s.substr(s.find(',') + 1, s.npos);
+		}
+		val[Columns - 1] = val[Columns - 1].substr(0, val[Columns - 1].find('\n'));
+		string Ws = val[2];
+		//*************************
+		//обработка даты и времени
+		//*************************
+		string Year, Month, Day;
+		Year = Ws.substr(0, 4);
+		//cout<<"Year"<<Year<<endl;
+		Month = Ws.substr(Ws.find('-') + 1, 2);
+		//cout<<"Month"<<Month<<endl;
+		Day = Ws.substr(8, Ws.npos);
+		//cout<<"Day"<<Day<<endl;
+		Ws = Day + '/' + Month + '/' + Year;
+		Ws += " ";
+		Ws += val[3];
+		Value.Date = Ws;
+		Value.Val = val[TagNumber + 5];
+		ListValues.push_back(Value);
+	}
+}
 
 int Tag::WriteValues(FILE * fp, FILE * fw, int TagNumber)
 {
@@ -102,6 +134,55 @@ int Tag::WriteValues(FILE * fp, FILE * fw, int TagNumber)
 	Ws += "\n";
 	const char *w = Ws.c_str();
 	fputs(w, fw);
+	return 0;
+}
+
+int Tag::WriteTag(FILE * fw)
+{
+	string Ws;
+	for (list <Values>::iterator i = ListValues.begin(); i != ListValues.end();i++) 
+	{
+		Value = *i;
+		Ws = Value.Date + "," + Value.Val +"\n";
+		const char * w = Ws.c_str();
+		fputs(w, fw);
+	}	
+	return 0;
+}
+
+int Tag::WriteValuesXML(FILE * fp, FILE * fw, int TagNumber, string InitTime) 
+{
+	char line[255], * VarLine;
+	while (!feof(fp)) 
+	{
+		fgets(line, 255, fp);
+		string val[Columns], s = string(line);
+		for (short i = 0; i < Columns; i++)
+		{
+			val[i] = s.substr(0, s.find(','));
+			s = s.substr(s.find(',') + 1, s.npos);
+		}
+		val[Columns - 1] = val[Columns - 1].substr(0, val[Columns - 1].find('\n'));
+		string Ws = val[2];
+		//*************************
+		//обработка даты и времени
+		//*************************
+		string Year, Month, Day;
+		Year = Ws.substr(0, 4);
+		//cout<<"Year"<<Year<<endl;
+		Month = Ws.substr(Ws.find('-') + 1, 2);
+		//cout<<"Month"<<Month<<endl;
+		Day = Ws.substr(8, Ws.npos);
+		//cout<<"Day"<<Day<<endl;
+		Ws = Day + '/' + Month + '/' + Year;
+		Ws += " ";
+		Ws += val[3];
+		Ws += ",";
+		Ws += val[TagNumber + 5];
+		Ws += "\n";
+		const char *w = Ws.c_str();
+	}	
+	fputs(VarLine, fw);
 	return 0;
 }
 

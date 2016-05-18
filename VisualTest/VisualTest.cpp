@@ -17,6 +17,7 @@ struct tm	*time1	= localtime(&T1),
 Tag			TagArr[200];
 Tag			SelectedTags[200];
 string		TagName[200];
+
 //FILE		*frw;
 //char		*HCombo;
 
@@ -254,8 +255,9 @@ INT_PTR CALLBACK TimeWindow(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 				GetTagByName(TagArr, CurrentTag, str, 200);
 				/*if (GetTagByName(SelectedTags, dTag, str, 200)) 
 				{
-
+				
 				}*/
+				SelectedTags[0] = CurrentTag;
 				SetDlgItemTextA(hDlg, IDC_TEXT, CurrentTag.Description.c_str());
 			}
 		}
@@ -301,7 +303,21 @@ INT_PTR CALLBACK TimeWindow(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 			}
 			WriteFindValues(3, TagArr, fw, T1, T2, GetDlgItemInt(hDlg, IDC_STEP, 0, 0));
 			fclose(fw);
-		}		
+		}
+		case IDC_WRITE1:
+		{
+			FILE *fw;
+			fopen_s(&fw, "test", "w");
+			string N, D, U;
+			N = "," + SelectedTags[0].Name + "\n";
+			fputs(N.c_str(), fw);								//запись заголовков	
+			D = "," + SelectedTags[0].Description + "\n";
+			fputs(D.c_str(), fw);							//запись описания Тега
+			U = "," + SelectedTags[0].Units + "\n";
+			fputs(U.c_str(), fw);								//запись ед. измерения Тега
+			SelectedTags[0].WriteTag(fw);		//считывание и запись в новый файл	данных							
+			fclose(fw);
+		}
 		case IDCANCEL:
 			EndDialog(hDlg, LOWORD(wParam));
 			return (INT_PTR)TRUE;
@@ -364,6 +380,9 @@ INT_PTR CALLBACK TagWindow(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam
 					for (int i = 0; i < 8; i++)
 					{									//считывание заголовков            
 						TagArr[f * 8 + i].ReadHeader(fp, i);
+						string Mes = "Идет обработка файла: " + Files[f];
+						SetDlgItemTextA(hDlg, IDC_LOGER, Mes.c_str());
+						TagArr[f * 8 + i].ReadValues(fp, i);
 						//TagName[f * 8 + i] = TagArr[f * 8 + i].Name;
 						string TagFileNameStr= TagArr[f * 8 + i].Name;
 						for (std::string::size_type n = 0; (n = TagFileNameStr.find(".", n)) != std::string::npos; ++n)
@@ -375,6 +394,8 @@ INT_PTR CALLBACK TagWindow(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam
 				}
 				fclose(fp);
 			}
+			string Mes = "Считывание завершено";
+			SetDlgItemTextA(hDlg, IDC_LOGER, Mes.c_str());
 		}
 		break;
 		case IDC_EXPL: 
@@ -479,6 +500,20 @@ INT_PTR CALLBACK TagWindow(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam
 			DialogBox(hInst, MAKEINTRESOURCE(IDD_DIALOG1), hDlg, TimeWindow);
 			break;
 		case IDCANCEL:
+		case IDC_WRITE: 
+		{
+			FILE *fw;
+			fopen_s(&fw, "test", "w");
+			string N, D, U;
+			N = ","+ TagArr[0].Name +"\n";
+			fputs(N.c_str(), fw);								//запись заголовков	
+			D = "," + TagArr[0].Description + "\n";
+			fputs(D.c_str(), fw);							//запись описания Тега
+			U = "," + TagArr[0].Units + "\n";
+			fputs(U.c_str(), fw);								//запись ед. измерения Тега
+			TagArr[0].WriteTag(fw);		//считывание и запись в новый файл	данных							
+			fclose(fw);
+		}
 			EndDialog(hDlg, LOWORD(wParam));
 			return (INT_PTR)TRUE;
 		}
